@@ -1,4 +1,5 @@
 import { BOARD_SIZE, ROW_SIZE } from "../common/constants.ts";
+import { Board, Move, Symbol } from "../types/index.ts";
 
 export class Game {
   private _board;
@@ -53,25 +54,52 @@ export class Game {
   }
 
   gameOverCheck() {
-    /* const hasRow = false;
-    const hasDiagonal = false; */
-
-    if (this.hasColumn() || !this.hasFreeSeats()) {
+    if (this.hasRow() || this.hasColumn() || !this.hasFreeSeats()) {
       this._isGameOver = true;
     }
 
     return this._isGameOver;
   }
 
+  /*
+   * Returns true when it finds a column filled with one symbol
+   */
   private hasColumn() {
-    let i = 0;
+    let col = 0;
     let match = false;
 
-    while (!match && i < ROW_SIZE) {
-      match = this._board[i] !== undefined &&
-        this._board[i] === this._board[i + ROW_SIZE] &&
-        this._board[i + ROW_SIZE] === this._board[i + ROW_SIZE * 2];
-      i++;
+    while (!match && col < ROW_SIZE) {
+      const first = this._board[col];
+      const second = this._board[col + ROW_SIZE];
+      const third = this._board[col + ROW_SIZE * 2];
+
+      match = first !== undefined &&
+        first === second &&
+        second === third;
+
+      col++;
+    }
+
+    return match;
+  }
+
+  /*
+   * Returns true when it finds a row filled with one symbol
+   */
+  private hasRow() {
+    let row = 0;
+    let match = false;
+
+    while (!match && row < BOARD_SIZE) {
+      const firstSeat = this._board[row];
+      const secondSeat = this._board[row + 1];
+      const thirdSeat = this._board[row + 2];
+
+      match = firstSeat !== undefined &&
+        firstSeat === secondSeat &&
+        secondSeat === thirdSeat;
+
+      row += ROW_SIZE;
     }
 
     return match;
@@ -81,17 +109,3 @@ export class Game {
     return this._board.length < BOARD_SIZE;
   }
 }
-
-export class Move {
-  position: number;
-  symbol: Symbol;
-
-  constructor(position: number, symbol: Symbol) {
-    this.position = position;
-    this.symbol = symbol;
-  }
-}
-
-export type Symbol = "X" | "O";
-
-type Board = Array<Symbol>;

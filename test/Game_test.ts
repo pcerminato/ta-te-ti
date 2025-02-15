@@ -1,13 +1,23 @@
 import { expect } from "jsr:@std/expect";
 import { describe, it } from "jsr:@std/testing/bdd";
-import { Game, Move, Symbol } from "../src/core/Game.ts";
+
+import { Game } from "../src/core/Game.ts";
+import { Symbol } from "../src/types/index.ts";
 import { BOARD_SIZE } from "../src/common/constants.ts";
+import {
+  firstColXFull,
+  firstRowOFull,
+  secondColXFull,
+  secondRowOFull,
+  thirdColXFull,
+  thirdRowOFull,
+} from "../src/data/moves-sets.ts";
 
 describe("Symbol insertion", () => {
   it("Should inserts X symbol in position 0", () => {
     const position = 0;
     const symbol: Symbol = "X";
-    const move = new Move(position, symbol);
+    const move = { position, symbol };
     const game = new Game();
 
     game.playTurn(move);
@@ -22,8 +32,8 @@ describe("Board boundaries", () => {
     const symbol: Symbol = "X";
     const game = new Game();
 
-    game.playTurn(new Move(position, symbol));
-    game.playTurn(new Move(position, "O"));
+    game.playTurn({ position, symbol });
+    game.playTurn({ position, symbol: "O" });
 
     expect(game.board[position]).toEqual(symbol);
   });
@@ -32,7 +42,7 @@ describe("Board boundaries", () => {
     const wrongPosition = BOARD_SIZE + 1;
     const game = new Game();
 
-    game.playTurn(new Move(wrongPosition, "X"));
+    game.playTurn({ position: wrongPosition, symbol: "X" });
 
     expect(game.board).toHaveLength(0);
   });
@@ -45,8 +55,8 @@ describe("Turns evaluation", () => {
     const symbol: Symbol = "X";
     const game = new Game();
 
-    game.playTurn(new Move(position, symbol));
-    game.playTurn(new Move(positionNext, symbol));
+    game.playTurn({ position, symbol });
+    game.playTurn({ position: positionNext, symbol });
 
     expect(game.board).toHaveLength(1);
   });
@@ -56,8 +66,8 @@ describe("Turns evaluation", () => {
 
     expect(game.getNextTurnSymbol()).toEqual("X");
 
-    game.playTurn(new Move(0, "X"));
-    game.playTurn(new Move(1, "O"));
+    game.playTurn({ position: 0, symbol: "X" });
+    game.playTurn({ position: 1, symbol: "O" });
 
     expect(game.getNextTurnSymbol()).toEqual("X");
   });
@@ -67,7 +77,7 @@ describe("Turns evaluation", () => {
 
     expect(game.getNextTurnSymbol()).toEqual("X");
 
-    game.playTurn(new Move(0, "X"));
+    game.playTurn({ position: 0, symbol: "X" });
 
     expect(game.getNextTurnSymbol()).toEqual("O");
   });
@@ -80,21 +90,46 @@ describe("Game over", () => {
     expect(game.gameOverCheck()).toBe(false);
 
     for (let i = 0; i < BOARD_SIZE; i++) {
-      game.playTurn(new Move(i, (i % 2) ? "O" : "X"));
+      const symbol = (i % 2) ? "O" : "X";
+      game.playTurn({ position: i, symbol });
     }
 
     expect(game.gameOverCheck()).toBe(true);
   });
 
-  it("Game is over when there there's a full column with with X", () => {
-    const game = new Game();
+  describe("Game is over when there there's a full column with one symbol", () => {
+    const allPosibleColMoves = [firstColXFull, secondColXFull, thirdColXFull];
 
-    expect(game.gameOverCheck()).toBe(false);
+    allPosibleColMoves.forEach((currentMovesSet, i) => {
+      it(`should game over when the #${i + 1} column is full with X`, () => {
+        const game = new Game();
 
-    for (let i = 0; i < BOARD_SIZE; i++) {
-      game.playTurn(new Move(i, (i % 2) ? "O" : "X"));
-    }
+        expect(game.gameOverCheck()).toBe(false);
 
-    expect(game.gameOverCheck()).toBe(true);
+        currentMovesSet.forEach((move) => game.playTurn(move));
+
+        expect(game.gameOverCheck()).toBe(true);
+      });
+    });
+  });
+
+  describe("Game is over when there there's a full column with one symbol", () => {
+    const allPosibleRowMoves = [
+      firstRowOFull,
+      secondRowOFull,
+      thirdRowOFull,
+    ];
+
+    allPosibleRowMoves.forEach((currentMovesSet, i) => {
+      it(`should game over when the #${i + 1} row is full with O`, () => {
+        const game = new Game();
+
+        expect(game.gameOverCheck()).toBe(false);
+
+        currentMovesSet.forEach((move) => game.playTurn(move));
+
+        expect(game.gameOverCheck()).toBe(true);
+      });
+    });
   });
 });
