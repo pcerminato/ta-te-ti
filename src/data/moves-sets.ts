@@ -140,3 +140,25 @@ export const thirdRowOFull: Move[] = [{
   position: 8,
   symbol: "O",
 }];
+
+/*
+| X |   |   |
+|   | X |   |
+| O | O | X |
+*/
+export const diagonalXFull: Move[] = [{
+  position: 4,
+  symbol: "X",
+}, {
+  position: 6,
+  symbol: "O",
+}, {
+  position: 0,
+  symbol: "X",
+}, {
+  position: 7,
+  symbol: "O",
+}, {
+  position: 8,
+  symbol: "X",
+}];

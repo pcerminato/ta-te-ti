@@ -2,9 +2,10 @@ import { expect } from "jsr:@std/expect";
 import { describe, it } from "jsr:@std/testing/bdd";
 
 import { Game } from "../src/core/Game.ts";
-import { Symbol } from "../src/types/index.ts";
+import { Board, Symbol } from "../src/types/index.ts";
 import { BOARD_SIZE } from "../src/common/constants.ts";
 import {
+  diagonalXFull,
   firstColXFull,
   firstRowOFull,
   secondColXFull,
@@ -27,13 +28,24 @@ describe("Symbol insertion", () => {
 });
 
 describe("Board boundaries", () => {
+  it("should throw an error when the board is longer that allowed", () => {
+    const longerBoard: Board = new Array(BOARD_SIZE + 1);
+
+    expect(() => new Game(longerBoard)).toThrow(
+      new Error(
+        `Board size initializer is ${longerBoard.length} long. Maximun size allowed is ${BOARD_SIZE}.`,
+      ),
+    );
+  });
+
   it("Won't allow inserting a symbol in position that is taken", () => {
     const position = 0;
     const symbol: Symbol = "X";
     const game = new Game();
 
     game.playTurn({ position, symbol });
-    game.playTurn({ position, symbol: "O" });
+
+    expect(() => game.playTurn({ position, symbol: "O" })).toThrow();
 
     expect(game.board[position]).toEqual(symbol);
   });
@@ -42,9 +54,8 @@ describe("Board boundaries", () => {
     const wrongPosition = BOARD_SIZE + 1;
     const game = new Game();
 
-    game.playTurn({ position: wrongPosition, symbol: "X" });
-
-    expect(game.board).toHaveLength(0);
+    expect(() => game.playTurn({ position: wrongPosition, symbol: "X" }))
+      .toThrow();
   });
 });
 
@@ -56,9 +67,8 @@ describe("Turns evaluation", () => {
     const game = new Game();
 
     game.playTurn({ position, symbol });
-    game.playTurn({ position: positionNext, symbol });
 
-    expect(game.board).toHaveLength(1);
+    expect(() => game.playTurn({ position: positionNext, symbol })).toThrow();
   });
 
   it("Next symbol should be X", () => {
@@ -106,7 +116,7 @@ describe("Game over", () => {
 
         expect(game.gameOverCheck()).toBe(false);
 
-        currentMovesSet.forEach((move) => game.playTurn(move));
+        game.playMovesSet(currentMovesSet);
 
         expect(game.gameOverCheck()).toBe(true);
       });
@@ -126,10 +136,20 @@ describe("Game over", () => {
 
         expect(game.gameOverCheck()).toBe(false);
 
-        currentMovesSet.forEach((move) => game.playTurn(move));
+        game.playMovesSet(currentMovesSet);
 
         expect(game.gameOverCheck()).toBe(true);
       });
     });
+  });
+
+  it("Game is over when there is a diagonal filled with the same symbol", () => {
+    const game = new Game();
+
+    expect(game.gameOverCheck()).toBe(false);
+
+    game.playMovesSet(diagonalXFull);
+
+    expect(game.gameOverCheck()).toBe(false);
   });
 });

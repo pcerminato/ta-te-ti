@@ -6,7 +6,12 @@ export class Game {
   private _isGameOver = false;
 
   constructor(board?: Board) {
-    this._board = board ?? [];
+    if (board && board.length > BOARD_SIZE) {
+      throw new Error(
+        `Board size initializer is ${board.length} long. Maximun size allowed is ${BOARD_SIZE}.`,
+      );
+    }
+    this._board = board ?? new Array(BOARD_SIZE);
   }
 
   get board() {
@@ -23,6 +28,12 @@ export class Game {
     }
   }
 
+  playMovesSet(movesSet: Move[]) {
+    movesSet.forEach((move) => {
+      this.playTurn(move);
+    });
+  }
+
   getNextTurnSymbol(): Symbol {
     const xCount = this.countSymbols("X");
     const oCount = this.countSymbols("O");
@@ -37,24 +48,37 @@ export class Game {
   private allRulesCheck(move: Move) {
     // seat is taken?
     if (this._board[move.position] !== undefined) {
-      return false;
+      throw new Error(
+        `Cannot insert becase the seat is taken alredy`,
+      );
     }
 
     // Is the right symbols turn?
-    if (this.getNextTurnSymbol() !== move.symbol) {
-      return false;
+    const nextTurnSymbol = this.getNextTurnSymbol();
+
+    if (nextTurnSymbol !== move.symbol) {
+      throw new Error(
+        `Cannot insert becase it is the turn for ${nextTurnSymbol} symbol, not ${move.symbol}`,
+      );
     }
 
     // position is withing the board?
     if (move.position > BOARD_SIZE - 1) {
-      return false;
+      throw new Error(
+        `Cannot insert into position ${move.position} because it is off the board. Highest position is ${
+          BOARD_SIZE - 1
+        }`,
+      );
     }
 
     return true;
   }
 
   gameOverCheck() {
-    if (this.hasRow() || this.hasColumn() || !this.hasFreeSeats()) {
+    if (
+      this._isGameOver || this.hasRow() || this.hasColumn() ||
+      !this.hasFreeSeats()
+    ) {
       this._isGameOver = true;
     }
 
@@ -106,6 +130,6 @@ export class Game {
   }
 
   private hasFreeSeats() {
-    return this._board.length < BOARD_SIZE;
+    return this._board.includes(undefined);
   }
 }
