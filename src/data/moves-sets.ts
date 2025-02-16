@@ -146,7 +146,7 @@ export const thirdRowOFull: Move[] = [{
 |   | X |   |
 | O | O | X |
 */
-export const diagonalXFull: Move[] = [{
+export const diagonalLeftToRightXFull: Move[] = [{
   position: 4,
   symbol: "X",
 }, {
@@ -161,4 +161,29 @@ export const diagonalXFull: Move[] = [{
 }, {
   position: 8,
   symbol: "X",
+}];
+
+/*
+| X | X | O |
+|   | O |   |
+| O |   |   |
+*/
+export const diagonalRightToLeftOFull: Move[] = [{
+  position: 0,
+  symbol: "X",
+}, {
+  position: 4,
+  symbol: "O",
+}, {
+  position: 1,
+  symbol: "X",
+}, {
+  position: 2,
+  symbol: "O",
+}, {
+  position: 3,
+  symbol: "X",
+}, {
+  position: 6,
+  symbol: "O",
 }];

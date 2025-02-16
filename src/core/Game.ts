@@ -75,12 +75,14 @@ export class Game {
   }
 
   gameOverCheck() {
-    if (
-      this._isGameOver || this.hasRow() || this.hasColumn() ||
-      !this.hasFreeSeats()
-    ) {
-      this._isGameOver = true;
+    if (this._isGameOver) {
+      return true;
     }
+
+    this._isGameOver = this.hasDiagonal() ||
+      this.hasRow() ||
+      this.hasColumn() ||
+      !this.hasFreeSeats();
 
     return this._isGameOver;
   }
@@ -93,14 +95,7 @@ export class Game {
     let match = false;
 
     while (!match && col < ROW_SIZE) {
-      const first = this._board[col];
-      const second = this._board[col + ROW_SIZE];
-      const third = this._board[col + ROW_SIZE * 2];
-
-      match = first !== undefined &&
-        first === second &&
-        second === third;
-
+      match = this.seatsAreAllEq([col, col + ROW_SIZE, col + ROW_SIZE * 2]);
       col++;
     }
 
@@ -115,21 +110,30 @@ export class Game {
     let match = false;
 
     while (!match && row < BOARD_SIZE) {
-      const firstSeat = this._board[row];
-      const secondSeat = this._board[row + 1];
-      const thirdSeat = this._board[row + 2];
-
-      match = firstSeat !== undefined &&
-        firstSeat === secondSeat &&
-        secondSeat === thirdSeat;
-
+      match = this.seatsAreAllEq([row, row + 1, row + 2]);
       row += ROW_SIZE;
     }
 
     return match;
   }
 
+  hasDiagonal() {
+    // left-to-right diagonal OR right-to-left
+    return this.seatsAreAllEq([0, 4, 8]) || this.seatsAreAllEq([2, 4, 6]);
+  }
+
   private hasFreeSeats() {
     return this._board.includes(undefined);
+  }
+
+  /* Utility to find consecutive equal symbols */
+  private seatsAreAllEq(positions: number[]) {
+    const firstSeat = this._board[positions[0]];
+    const secondSeat = this._board[positions[1]];
+    const thirdSeat = this._board[positions[2]];
+
+    return firstSeat !== undefined &&
+      firstSeat === secondSeat &&
+      secondSeat === thirdSeat;
   }
 }

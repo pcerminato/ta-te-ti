@@ -5,7 +5,8 @@ import { Game } from "../src/core/Game.ts";
 import { Board, Symbol } from "../src/types/index.ts";
 import { BOARD_SIZE } from "../src/common/constants.ts";
 import {
-  diagonalXFull,
+  diagonalLeftToRightXFull,
+  diagonalRightToLeftOFull,
   firstColXFull,
   firstRowOFull,
   secondColXFull,
@@ -143,13 +144,23 @@ describe("Game over", () => {
     });
   });
 
-  it("Game is over when there is a diagonal filled with the same symbol", () => {
+  it("Game is over when there is a left-to-right diagonal filled with the same symbol", () => {
     const game = new Game();
 
     expect(game.gameOverCheck()).toBe(false);
 
-    game.playMovesSet(diagonalXFull);
+    game.playMovesSet(diagonalLeftToRightXFull);
+
+    expect(game.gameOverCheck()).toBe(true);
+  });
+
+  it("Game is over when there is a right-to-left diagonal filled with the same symbol", () => {
+    const game = new Game();
 
     expect(game.gameOverCheck()).toBe(false);
+
+    game.playMovesSet(diagonalRightToLeftOFull);
+
+    expect(game.gameOverCheck()).toBe(true);
   });
 });
