@@ -1,0 +1,15 @@
+.board {
+  display: grid;
+  grid-gap: 10px;
+  grid-template-columns: repeat(3, 100px);
+  justify-content: center;
+  align-items: center;
+}
+
+.seat {
+  background-color: blanchedalmond;
+  border-radius: 5px;
+  padding: 20px;
+  font-size: 150%;
+  height: 60px;
+}
