@@ -17,8 +17,14 @@ function logGameState(stateMessage: string) {
   console.log(stateMessage);
 }
 
-function drawBoard(board: Board) {
-  console.log(board);
+function drawSymbols(board: Board) {
+  board.forEach((symbol, position) => {
+    const seat = document.querySelector(`div[data-seat-index='${position}'`);
+
+    if (seat) {
+      seat.innerHTML = symbol;
+    }
+  });
 }
 
 function boardClickEventHandler(game: Game) {
@@ -36,13 +42,18 @@ function boardClickEventHandler(game: Game) {
     try {
       game.playTurn(move);
 
+      drawSymbols(game.board);
+
       if (game.gameOverCheck()) {
         // here event.currentTarget = this, but currentTarget is more convenient to type
         (event.currentTarget as HTMLDivElement).removeEventListener(
           "click",
           handleBoardClick,
         );
-        logGameState("Game over"); // TODO: detailed state (who won?)
+        logGameState("Game over");
+      } else {
+        const nextTurnSymbol = game.getNextTurnSymbol();
+        logGameState(`Is ${nextTurnSymbol} turn`);
       }
     } catch (error) {
       const message = (error as Error)?.message || UNKNOWN_ERR;
