@@ -14,16 +14,16 @@ export function gameStart() {
 }
 
 function logGameState(stateMessage: string) {
-  console.log(stateMessage);
+  const gameStateView = document.querySelector("div.game-state");
+
+  gameStateView!.innerHTML = stateMessage;
 }
 
 function drawSymbols(board: Board) {
   board.forEach((symbol, position) => {
     const seat = document.querySelector(`div[data-seat-index='${position}'`);
 
-    if (seat) {
-      seat.innerHTML = symbol;
-    }
+    seat!.innerHTML = symbol;
   });
 }
 
@@ -53,7 +53,7 @@ function boardClickEventHandler(game: Game) {
         logGameState("Game over");
       } else {
         const nextTurnSymbol = game.getNextTurnSymbol();
-        logGameState(`Is ${nextTurnSymbol} turn`);
+        logGameState(`Is ${nextTurnSymbol}'s turn`);
       }
     } catch (error) {
       const message = (error as Error)?.message || UNKNOWN_ERR;
